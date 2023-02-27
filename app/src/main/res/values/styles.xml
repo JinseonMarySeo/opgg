@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextStyle_Dark">
+        <item name="android:textColor">@color/dark_grey</item>
+        <item name="android:textSize">@dimen/font_default</item>
+    </style>
+
+    <style name="TextStyle_White">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/font_default</item>
+    </style>
+
+    <style name="LevelStyle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/font_sub</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:minWidth">33dp</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:background">@drawable/border_rounded_black</item>
+        <item name="android:gravity">center</item>
+    </style>
+</resources>

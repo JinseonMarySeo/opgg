@@ -1,0 +1,21 @@
+<resources>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="default_horizontal_margin">16dp</dimen>
+    <dimen name="card_horizontal_space">8dp</dimen>
+
+    <dimen name="profile_circle_size">72dp</dimen>
+    <dimen name="challenger_img_size">48dp</dimen>
+    <dimen name="champion_circle_size">40dp</dimen>
+    <dimen name="champion_most_size">30dp</dimen>
+    <dimen name="league_card_width">240dp</dimen>
+    <dimen name="right_arrow_back_size">40dp</dimen>
+
+    <dimen name="font_default">14sp</dimen>
+    <dimen name="font_title">22sp</dimen>
+    <dimen name="font_score">16sp</dimen>
+    <dimen name="font_sub">12sp</dimen>
+    <dimen name="font_small">10sp</dimen>
+</resources>

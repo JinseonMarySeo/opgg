@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">OPGG_과제_서진선</string>
+
+    <string name="button_reload">전적갱신</string>
+    <string name="format_league_lp" formatted="true">%s LP</string>
+    <string name="format_record_base" formatted="true">%d승 %d패</string>
+    <string name="format_record_percent" formatted="true">%d승 %d패 (%d%%)</string>
+    <string name="format_percent" formatted="true">%d%%</string>
+</resources>
