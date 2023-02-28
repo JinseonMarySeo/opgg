@@ -1,4 +1,4 @@
-package com.maryseo.opgg_test.data
+package com.maryseo.opgg_test.network.model
 
 data class League(
     val hasResult: Boolean,

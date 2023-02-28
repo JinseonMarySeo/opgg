@@ -1,4 +1,4 @@
-package com.maryseo.opgg_test.data
+package com.maryseo.opgg_test.network.model
 
 data class Tier(
     val name: String,

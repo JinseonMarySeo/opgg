@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterialApi::class)
 
-package com.maryseo.opgg_test
+package com.maryseo.opgg_test.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,26 +18,28 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.maryseo.opgg_test.data.Summoner
+import com.maryseo.opgg_test.R
+import com.maryseo.opgg_test.network.model.Summoner
+import com.maryseo.opgg_test.network.other.Status
 import com.maryseo.opgg_test.ui.item.IconProfileWithTxt
 import com.maryseo.opgg_test.ui.item.LeagueItem
-import com.maryseo.opgg_test.ui.theme.OPGG_TESTTheme
-import com.maryseo.opgg_test.ui.theme.SoftBlue
-import com.maryseo.opgg_test.ui.theme.Transparent
-import com.maryseo.opgg_test.ui.theme.Typography
+import com.maryseo.opgg_test.ui.theme.*
+import com.maryseo.opgg_test.ui.view.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val mainVM: MainViewModel by viewModels()
-    val summoner = mutableStateOf(Summoner())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,19 +58,36 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getSummoner() {
-        mainVM.getSummoner(name = "genetory", summoner)
+        mainVM.getSummoner(name = "genetory")
+    }
+
+    private fun getMatches() {
+        mainVM.getMatches(name = "genetory")
     }
 
     @Composable
     private fun Content() {
-        getSummoner()
+        val summoner = mainVM.summoner.observeAsState().value
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item {
-                ProfileArea(summoner = summoner.value)
+        LaunchedEffect(key1 = mainVM) {
+            getSummoner()
+            getMatches()
+        }
+
+        when (summoner?.status) {
+            Status.SUCCESS -> {
+                LazyColumn {
+                    item {
+                        ProfileArea(summoner = summoner.data!!)
+                    }
+                }
             }
+            Status.LOADING -> {
 
+            }
+            else -> {
 
+            }
         }
     }
 

@@ -8,6 +8,7 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 val Transparent = Color(0x00FFFFFF)
+val White = Color(0xFFFFFFFF)
 val DarkGrey = Color(0xFF1E2022)
 val CharcoalGrey = Color(0xFF33383C)
 val CoolGrey = Color(0xFF98A0A7)

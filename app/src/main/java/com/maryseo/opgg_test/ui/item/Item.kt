@@ -25,14 +25,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
-import com.maryseo.opgg_test.data.League
+import com.maryseo.opgg_test.network.model.League
 import com.maryseo.opgg_test.ui.theme.*
 import java.text.NumberFormat
 
 
 @Composable
 fun IconProfileWithTxt(modifier: Modifier, imgUrl: String?, name: String?) {
-    Log.e("TAG", "IconImgWithTxt() imgUrl = $imgUrl")
+    Log.e("IconProfileWithTxt()", "imgUrl = $imgUrl")
     Box(
         contentAlignment = Alignment.BottomStart,
         modifier = modifier
