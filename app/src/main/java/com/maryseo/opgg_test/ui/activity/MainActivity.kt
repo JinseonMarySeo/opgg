@@ -2,7 +2,6 @@
 
 package com.maryseo.opgg_test.ui.activity
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,14 +26,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
+import com.maryseo.opgg_test.network.data.dto.Game
 import com.maryseo.opgg_test.network.data.dto.Summoner
-import com.maryseo.opgg_test.network.data.response.MatchesResponse
-import com.maryseo.opgg_test.network.other.Result
 import com.maryseo.opgg_test.network.other.Status
 import com.maryseo.opgg_test.ui.item.*
 import com.maryseo.opgg_test.ui.theme.*
+import com.maryseo.opgg_test.util.formatGameLength
+import com.maryseo.opgg_test.util.formatTimestamp
+import com.maryseo.opgg_test.util.strIsWin
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -57,11 +57,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun getSummoner() {
+    private fun getSummonerAndMatchResults() {
         mainVM.getSummoner(name = "genetory")
-    }
-
-    private fun getMatches() {
         mainVM.getMatches(name = "genetory")
     }
 
@@ -71,39 +68,41 @@ class MainActivity : ComponentActivity() {
         val matchResult = mainVM.matches.observeAsState().value
 
         LaunchedEffect(key1 = mainVM) {
-            getSummoner()
-            getMatches()
+            getSummonerAndMatchResults()
         }
 
         when (summoner?.status) {
             Status.SUCCESS -> {
-                LazyColumn {
+                LazyColumn(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     item {
                         ProfileArea(summoner = summoner.data!!)
                     }
 
-                    item {
-                        setMatchesResult(matchResult = matchResult)
+                    matchResult?.let {
+                        when (matchResult.status) {
+                            Status.SUCCESS -> {
+                                item {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    MatchHeader(matchResult.data!!)
+                                }
+
+                                matchResult.data?.games?.let { gameList ->
+                                    items(
+                                        items = gameList,
+                                        itemContent = { MatchItem(it) }
+                                    )
+                                }
+                            }
+                            Status.LOADING -> {
+
+                            }
+                            else -> {
+
+                            }
+                        }
                     }
+
                 }
-            }
-            Status.LOADING -> {
-
-            }
-            else -> {
-
-            }
-        }
-
-        
-    }
-    
-    @Composable
-    private fun setMatchesResult(matchResult: Result<MatchesResponse>?) {
-        when (matchResult?.status) {
-            Status.SUCCESS -> {
-                Spacer(modifier = Modifier.height(8.dp))
-                MatchHeader(matchResult.data!!)
             }
             Status.LOADING -> {
 
@@ -149,25 +148,11 @@ class MainActivity : ComponentActivity() {
                 style = Typography.h1
             )
 
-            Button(
-                onClick = {
-                    getSummoner()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = SoftBlue,
-                    contentColor = White
-                ),
-                modifier = Modifier
-                    .constrainAs(button) {
-                        start.linkTo(profile.end, margin = defaultPadding)
-                        top.linkTo(text.bottom, margin = 8.dp)
-                    }
-                    .wrapContentWidth()
-                    .height(36.dp),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Text(text = stringResource(id = R.string.button_reload))
-            }
+            RoundedButtonSoftBlue(onClick = { getSummonerAndMatchResults() }, modifier =Modifier
+                .constrainAs(button) {
+                    start.linkTo(profile.end, margin = defaultPadding)
+                    top.linkTo(text.bottom, margin = 8.dp)
+                }, name = stringResource(id = R.string.button_reload))
 
             LazyRow(modifier = Modifier.constrainAs(leagues) {
                 top.linkTo(profile.bottom, margin = 31.dp)
@@ -196,10 +181,88 @@ fun getValidUrl(url: String): String {
 }
 
 
-
 @Composable
-private fun MatchItem() {
+fun MatchItem(game: Game) {
+    val defaultPadding = dimensionResource(id = R.dimen.default_horizontal_margin)
+    val stats = game.stats
 
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(White)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(dimensionResource(id = R.dimen.match_result_left_width))
+                .defaultMinSize(minHeight = 104.dp)
+                .background(if (game.isWin) DarkishPink else SoftBlue),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = strIsWin(isWin = game.isWin), style = Typography.h2, color = White)
+            BarView(width = 16.dp, height = 1.dp, color = White_40)
+            Text(text = formatGameLength(gameLength = game.gameLength), style = Typography.body1, color = White)
+        }
+
+        Column {
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(defaultPadding)
+            ) {
+                val (champion, grid, type, timestamp, stat, item) = createRefs()
+                val championImgUrl = game.champion.imageUrl
+                IconChampionWithBadge(modifier = Modifier.constrainAs(champion) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                }, imgUrl = championImgUrl, name = game.stats.general.opScoreBadge)
+
+                GridSpellAndPeak(modifier = Modifier.constrainAs(grid) {
+                    top.linkTo(parent.top)
+                    start.linkTo(champion.end, margin = 4.dp)
+                }, game)
+
+                Column(modifier = Modifier
+                    .constrainAs(stat) {
+                        top.linkTo(parent.top)
+                        start.linkTo(grid.end, margin = defaultPadding)
+                    }
+                    .padding(vertical = 2.dp)) {
+                    val data = arrayOf(stats.general.kill, stats.general.assist, stats.general.death)
+                    Stats(
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        style = Typography.h2,
+                        data = data
+                    )
+                    Text(
+                        text = stringResource(id = R.string.format_kill_rate).format(stats.general.contributionForKillRate),
+                        style = Typography.body1
+                    )
+                }
+
+                RowItems(modifier = Modifier
+                    .constrainAs(item) {
+                        top.linkTo(grid.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        bottom.linkTo(parent.bottom)
+                    }, items = game.items
+                )
+
+                Text(modifier = Modifier.constrainAs(type) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                }, text = game.gameType, style = Typography.body1, color = CoolGrey)
+
+                Text(modifier = Modifier.constrainAs(timestamp) {
+                    top.linkTo(type.bottom)
+                    end.linkTo(parent.end)
+                }, text = formatTimestamp(timestamp = game.createDate.toLong()), style = Typography.body1, color = CoolGrey)
+            }
+        }
+
+        
+    }
 }
 
 @Composable
@@ -251,7 +314,7 @@ private fun PreviewTest(name: String) {
                     .height(36.dp),
                 shape = RoundedCornerShape(20.dp)
             ) {
-                Text(text = stringResource(id = R.string.button_reload))
+                Text(text = stringResource(id = R.string.button_reload), color = White)
             }
 
 
@@ -362,6 +425,58 @@ private fun PreviewTest(name: String) {
                 color = DarkGrey,
                 textAlign = TextAlign.Center
             )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(dimensionResource(id = R.dimen.match_result_left_width))
+                    .defaultMinSize(minHeight = 104.dp)
+                    .background(if (false) DarkishPink else SoftBlue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = strIsWin(isWin = false), style = Typography.h2, color = White)
+                BarView(width = 16.dp, height = 1.dp, color = White_40)
+                Text(text = formatGameLength(gameLength = 2720), style = Typography.body1, color = White)
+            }
+
+            Column {
+                ConstraintLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(defaultPadding)
+                ) {
+                    val (champion, grid, type, timestamp, stat) = createRefs()
+                    val championImgUrl = null //game.champion.imageUrl
+                    IconChampionWithBadge(modifier = Modifier.constrainAs(champion) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    }, imgUrl = championImgUrl, name = null)
+
+//                    GridSpellAndPeak(modifier = Modifier.constrainAs(grid) {
+//                        top.linkTo(parent.top)
+//                        start.linkTo(champion.end, margin = 4.dp)
+//                    })
+
+                    Text(modifier = Modifier.constrainAs(type) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }, text = "솔랭", style = Typography.body1, color = CoolGrey)
+
+                    Text(modifier = Modifier.constrainAs(timestamp) {
+                        top.linkTo(type.bottom)
+                        end.linkTo(parent.end)
+                    }, text = formatTimestamp(timestamp = 1677548381), style = Typography.body1, color = CoolGrey)
+                }
+            }
+
+
         }
     }
 

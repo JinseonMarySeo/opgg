@@ -8,8 +8,13 @@
     <string name="format_record_percent" formatted="true">%d승 %d패 (%d%%)</string>
     <string name="format_percent" formatted="true">%d%%</string>
     <string name="format_stats" formatted="true">%d / %d / %d</string>
+    <string name="format_timestamp_minute" formatted="true">%d분 전</string>
+    <string name="format_timestamp_hour" formatted="true">%d시간 전</string>
+    <string name="format_timestamp_day" formatted="true">%d일 전</string>
+    <string name="format_kill_rate" formatted="true">킬관여 %s</string>
     
     <string name="title_recent_matches">최근 20게임 분석</string>
     <string name="title_most_rate">모스트 승률</string>
     <string name="title_position">포지션</string>
+
 </resources>

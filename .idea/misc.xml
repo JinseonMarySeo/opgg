@@ -12,6 +12,10 @@
         <entry key="../../../../../layout/compose-model-1677594745393.xml" value="0.375" />
         <entry key="../../../../../layout/compose-model-1677595954812.xml" value="0.55" />
         <entry key="../../../../../layout/compose-model-1677598954582.xml" value="0.23564189189189189" />
+        <entry key="../../../../../layout/compose-model-1677607621576.xml" value="0.25" />
+        <entry key="../../../../../layout/compose-model-1677740527988.xml" value="0.2222222222222222" />
+        <entry key="../../../../../layout/compose-model-1677740763323.xml" value="0.45" />
+        <entry key="../../../../../layout/compose-model-1677744980759.xml" value="0.27037037037037037" />
         <entry key="../../../layout/compose-model-1677467316537.xml" value="0.29307432432432434" />
         <entry key="../../../layout/compose-model-1677475586829.xml" value="0.2905405405405405" />
         <entry key="../../../layout/compose-model-1677480491060.xml" value="0.29307432432432434" />
@@ -24,6 +28,9 @@
         <entry key="app/src/main/res/drawable-v24/bg_circle_pale_grey.xml" value="0.1725" />
         <entry key="app/src/main/res/drawable-v24/border_rounded_black.xml" value="0.211" />
         <entry key="app/src/main/res/drawable/bg_circle_pale_grey.xml" value="0.12" />
+        <entry key="app/src/main/res/drawable/bg_rounded_pale_grey.xml" value="0.12" />
+        <entry key="app/src/main/res/drawable/border_rounded_black.xml" value="0.12" />
+        <entry key="app/src/main/res/drawable/border_rounded_blue.xml" value="0.12" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1725" />
         <entry key="app/src/main/res/drawable/icon_arrow_right.xml" value="0.12" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.22056159420289856" />

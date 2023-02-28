@@ -17,12 +17,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
+import com.maryseo.opgg_test.network.data.dto.Game
+import com.maryseo.opgg_test.network.data.dto.Item
 import com.maryseo.opgg_test.network.data.dto.League
 import com.maryseo.opgg_test.network.data.response.MatchesResponse
 import com.maryseo.opgg_test.ui.activity.getValidUrl
@@ -46,16 +50,18 @@ fun IconChampionWithBadge(modifier: Modifier, imgUrl: String?, name: String?) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(DarkGrey)
-                    .defaultMinSize(minWidth = 33.dp, minHeight = 20.dp)
-                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(width = 1.dp, color = Color.White, shape = RoundedCornerShape(8.dp))
+                    .background(OrangeYellow)
+                    .defaultMinSize(minWidth = 30.dp, minHeight = 16.dp)
+                    .padding(horizontal = 4.dp, vertical = 3.dp)
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = name,
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             }
@@ -207,15 +213,11 @@ fun MatchHeader(match: MatchesResponse) {
             style = Typography.caption
         )
 
-        val strStats = stringResource(id = R.string.format_stats).format(match.summary.kills, match.summary.assists, match.summary.deaths) //"5.9 / 5.8 / 14.1"
-
-        Text(
-            modifier = Modifier.constrainAs(stats) {
-                bottom.linkTo(kda.top, margin = 3.dp)
-                start.linkTo(parent.start)
-            }, text = AnnotatedTextForStats(text = strStats),
-            style = Typography.subtitle1
-        )
+        val data = arrayOf(match.summary.kills, match.summary.assists, match.summary.deaths)
+        Stats(modifier = Modifier.constrainAs(stats) {
+            bottom.linkTo(kda.top, margin = 3.dp)
+            start.linkTo(parent.start)
+        }, style = Typography.subtitle1, data = data)
 
         Text(
             modifier = Modifier.constrainAs(result) {
@@ -313,5 +315,45 @@ fun MostChampionsUI(modifier: Modifier, match: MatchesResponse) {
                 rate = match.getMostChampions()[1].getRate()
             )
         }
+    }
+}
+
+@Composable
+fun GridSpellAndPeak(modifier: Modifier, game: Game) {
+    val space = 2.dp
+    val size = 19.dp
+
+    Row(modifier,
+        horizontalArrangement = Arrangement.spacedBy(space)) {
+        Column(verticalArrangement = Arrangement.spacedBy(space)) {
+            IconRadius(modifier = Modifier, imgUrl = game.spells[0].imageUrl, size = size, radius = 4.dp)
+            IconRadius(modifier = Modifier, imgUrl = game.spells[1].imageUrl, size = size, radius = 4.dp)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(space)) {
+            IconCircle(modifier = Modifier, imgUrl = game.peak[0], size = size)
+            IconCircle(modifier = Modifier, imgUrl = game.peak[1], size = size)
+        }
+    }
+}
+
+@Composable
+fun RowItems(modifier: Modifier, items: List<Item>) {
+    val space = 2.dp
+    val size = 24.dp
+
+    Row(modifier,
+        horizontalArrangement = Arrangement.spacedBy(space)) {
+        val iterator = items.iterator()
+        var index = 0
+        while (index < 6) {
+            val imgUrl = if (iterator.hasNext()) {
+                iterator.next().imageUrl
+            } else {
+                null
+            }
+            IconRadius(modifier = Modifier, imgUrl = imgUrl, size = size, radius = 4.dp)
+            index++
+        }
+        IconCircle(modifier = Modifier, imgUrl = null, size = size)
     }
 }
