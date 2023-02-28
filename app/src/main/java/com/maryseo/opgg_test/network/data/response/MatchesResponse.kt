@@ -14,11 +14,7 @@ data class MatchesResponse(
 ) {
     fun getMostChampions(): List<Champion> {
         val count = if (champions.size < 2) champions.size else 2
-        val t = champions.sortedByDescending { it.wins.toFloat() / it.games }.take(count)
-        champions.forEachIndexed { index, champion ->
-            Log.e("MatchesResponse", "champions[$index] = ${champion.name}")
-        }
-        return t
+        return champions.sortedByDescending { it.wins.toFloat() / it.games }.take(count)
     }
 
     fun getMostPosition(): Position {

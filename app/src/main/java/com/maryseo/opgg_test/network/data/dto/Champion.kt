@@ -11,4 +11,6 @@ data class Champion(
     val losses: Int,
     val name: String,
     val wins: Int
-)
+) {
+    fun getRate() = (wins.toFloat() / games * 100).toInt()
+}
