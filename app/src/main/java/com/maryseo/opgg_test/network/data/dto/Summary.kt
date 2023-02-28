@@ -1,4 +1,4 @@
-package com.maryseo.opgg_test.network.model
+package com.maryseo.opgg_test.network.data.dto
 
 data class Summary(
     val assists: Int,

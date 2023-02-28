@@ -3,38 +3,37 @@
 package com.maryseo.opgg_test.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.maryseo.opgg_test.R
-import com.maryseo.opgg_test.network.model.Summoner
+import com.maryseo.opgg_test.network.data.response.MatchesResponse
+import com.maryseo.opgg_test.network.data.dto.Summoner
+import com.maryseo.opgg_test.network.other.Result
 import com.maryseo.opgg_test.network.other.Status
-import com.maryseo.opgg_test.ui.item.IconProfileWithTxt
-import com.maryseo.opgg_test.ui.item.LeagueItem
+import com.maryseo.opgg_test.ui.item.*
 import com.maryseo.opgg_test.ui.theme.*
-import com.maryseo.opgg_test.ui.view.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -68,6 +67,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun Content() {
         val summoner = mainVM.summoner.observeAsState().value
+        val matchResult = mainVM.matches.observeAsState().value
 
         LaunchedEffect(key1 = mainVM) {
             getSummoner()
@@ -80,7 +80,30 @@ class MainActivity : ComponentActivity() {
                     item {
                         ProfileArea(summoner = summoner.data!!)
                     }
+
+                    item {
+                        setMatchesResult(matchResult = matchResult)
+                    }
                 }
+            }
+            Status.LOADING -> {
+
+            }
+            else -> {
+
+            }
+        }
+
+        
+    }
+    
+    @Composable
+    private fun setMatchesResult(matchResult: Result<MatchesResponse>?) {
+        when (matchResult?.status) {
+            Status.SUCCESS -> {
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        MatchHeader(matchResult.data!!)
             }
             Status.LOADING -> {
 
@@ -159,50 +182,128 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun MatchList() {
-
+        
     }
 }
+
+@Composable
+private fun MatchHeader(match: MatchesResponse) {
+    val defaultHorizontalPadding = dimensionResource(id = R.dimen.default_horizontal_margin)
+    val defaultVerticalPadding = dimensionResource(id = R.dimen.default_vertical_margin)
+
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(White)
+            .padding(horizontal = defaultHorizontalPadding, vertical = defaultVerticalPadding)
+    ) {
+        val (titleRecent, result, stats, kda, rightLayout) = createRefs()
+
+        Text(
+            modifier = Modifier
+                .constrainAs(titleRecent) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                },
+            text = stringResource(id = R.string.title_recent_matches),
+            style = Typography.caption,
+            color = CoolGrey
+        )
+
+        Text(
+            modifier = Modifier.constrainAs(kda) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+            },
+            text = "3.65:1 (66%)",
+            style = Typography.caption
+        )
+
+        val strStats = stringResource(id = R.string.format_stats).format(match.summary.kills, match.summary.assists, match.summary.deaths) //"5.9 / 5.8 / 14.1"
+        Text(
+            modifier = Modifier.constrainAs(stats) {
+                bottom.linkTo(kda.top, margin = 3.dp)
+                start.linkTo(parent.start)
+            }, text = AnnotatedTextForStats(text = strStats),
+            style = Typography.subtitle1
+        )
+
+        Text(
+            modifier = Modifier.constrainAs(result) {
+                top.linkTo(titleRecent.bottom, margin = 10.dp)
+                bottom.linkTo(stats.top, margin = 2.dp)
+                start.linkTo(parent.start)
+            }, text = stringResource(id = R.string.format_record_base).format(match.summary.wins, match.summary.losses),
+            style = Typography.caption,
+            color = CoolGrey
+        )
+
+        val (titlePosition, iconPosition, ratePosition) = createRefs()
+        val (titleMost, iconChampion1, rateChampion1, iconChampion2, rateChampion2) = createRefs()
+//        Text(
+//            modifier = Modifier
+//                .constrainAs(titleMost) {
+//                    top.linkTo(parent.top)
+//                    end.linkTo(titlePosition.start)
+//                }
+//                .width(dimensionResource(id = R.dimen.header_most_rate_width)),
+//            text = stringResource(id = R.string.title_most_rate),
+//            style = Typography.caption,
+//            color = CoolGrey,
+//            textAlign = TextAlign.Center
+//        )
+
+        Text(
+            modifier = Modifier
+                .constrainAs(titlePosition) {
+                    top.linkTo(parent.top)
+                    start.linkTo(titleMost.end)
+                    end.linkTo(parent.end)
+                }
+                .width(dimensionResource(id = R.dimen.header_position_width)),
+            text = stringResource(id = R.string.title_position),
+            style = Typography.caption,
+            color = CoolGrey,
+            textAlign = TextAlign.Center
+        )
+
+        Image(
+            painter = painterResource(getPositionIcon(Position.valueOf(match.getMostPosition().position))),
+            contentDescription = null,
+            modifier = Modifier
+                .constrainAs(iconPosition) {
+                    top.linkTo(titlePosition.bottom, margin = 10.dp)
+                    start.linkTo(titlePosition.start)
+                    end.linkTo(titlePosition.end)
+                },
+            alignment = Alignment.Center
+        )
+
+        Text(
+            modifier = Modifier
+                .constrainAs(ratePosition) {
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(titlePosition.start)
+                    end.linkTo(titlePosition.end)
+                }
+                .width(dimensionResource(id = R.dimen.header_position_width)),
+            text = stringResource(id = R.string.format_percent).format(match.getMostPosition().getRate()),
+            style = Typography.caption,
+            color = DarkGrey,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+
 
 @Composable
 private fun MatchItem() {
 
 }
 
-
 @Composable
-fun MyListView(items: List<String>) {
-    // Create a state to hold the selected item
-    val selectedItem = remember { mutableStateOf(-1) }
-
-    // Use a LazyColumn to create the ListView
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        itemsIndexed(items) { index, item ->
-            // Create a ListItem for each item in the list
-            ListItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clickable { selectedItem.value = index },
-                text = { Text(text = item) },
-                secondaryText = { Text(text = "Item ${index + 1}") },
-                icon = {
-                    if (index == selectedItem.value) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
-            Divider()
-        }
-    }
-}
-
-@Composable
-private fun ToolbarTest(name: String) {
+private fun PreviewTest(name: String) {
 
     Column {
         val defaultPadding = dimensionResource(id = R.dimen.default_horizontal_margin)
@@ -255,20 +356,17 @@ private fun ToolbarTest(name: String) {
 
         }
 
-//        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//            items(2) {
-//                LeagueItem()
-//            }
-//        }
-        val items = listOf("Item 1", "Item 2", "Item 3", "Item 4")
-        MyListView(items = items)
+        Spacer(modifier = Modifier.height(8.dp))
+//        MatchHeader()
     }
+
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     OPGG_TESTTheme {
-        ToolbarTest(name = "genetory")
+        PreviewTest(name = "genetory")
     }
 }

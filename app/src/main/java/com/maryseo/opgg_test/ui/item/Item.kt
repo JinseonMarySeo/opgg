@@ -19,13 +19,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
-import com.maryseo.opgg_test.network.model.League
+import com.maryseo.opgg_test.network.data.dto.League
 import com.maryseo.opgg_test.ui.theme.*
 import java.text.NumberFormat
 
@@ -66,6 +70,19 @@ fun IconProfileWithTxt(modifier: Modifier, imgUrl: String?, name: String?) {
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AnnotatedTextForStats(text: String): AnnotatedString {
+    return buildAnnotatedString {
+        val assists = text.trim().split("/")[1]
+        val startIndex = text.indexOf(assists)
+        val endIndex = startIndex + assists.length
+        append(text)
+        withStyle(style = SpanStyle(color = DarkishPink)) {
+            addStyle(SpanStyle(color = DarkishPink), startIndex, endIndex)
         }
     }
 }
@@ -137,18 +154,15 @@ fun LeagueItem(league: League) {
                 color = Gunmetal
             )
 
-            val wins = league.wins
-            val losses = league.losses
-            val percent = ((wins.toFloat() / (wins + losses)) * 100).toInt()
             Text(
                 modifier = Modifier.constrainAs(result) {
                     top.linkTo(lp.bottom, margin = textPadding)
                     start.linkTo(image.end, margin = defaultPadding)
                 },
                 text = stringResource(id = R.string.format_record_percent).format(
-                    wins,
-                    losses,
-                    percent
+                    league.wins,
+                    league.losses,
+                    league.rate
                 ),
                 style = Typography.caption,
                 color = CoolGrey

@@ -1,8 +1,8 @@
-package com.maryseo.opgg_test.ui.view
+package com.maryseo.opgg_test.ui.activity
 
 import androidx.lifecycle.*
-import com.maryseo.opgg_test.network.model.MatchesResponse
-import com.maryseo.opgg_test.network.model.Summoner
+import com.maryseo.opgg_test.network.data.response.MatchesResponse
+import com.maryseo.opgg_test.network.data.dto.Summoner
 import com.maryseo.opgg_test.network.other.Result
 import com.maryseo.opgg_test.network.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,10 +30,10 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
         }
     }
 
-    fun getMatches(name: String) {
+    fun getMatches(name: String, createDate: Long? = null) {
         viewModelScope.launch {
             _matches.postValue(Result.loading())
-            repository.getMatches(name).let {
+            repository.getMatches(name, createDate).let {
                 if (it.isSuccessful) {
                     _matches.postValue(Result.success(it.body()))
                 } else {

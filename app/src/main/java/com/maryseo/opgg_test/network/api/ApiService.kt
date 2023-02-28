@@ -1,7 +1,7 @@
 package com.maryseo.opgg_test.network.api
 
-import com.maryseo.opgg_test.network.model.MatchesResponse
-import com.maryseo.opgg_test.network.model.SummonerResponse
+import com.maryseo.opgg_test.network.data.response.MatchesResponse
+import com.maryseo.opgg_test.network.data.response.SummonerResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -17,6 +17,6 @@ interface ApiService {
     @GET("summoner/{name}/matches")
     suspend fun getMatches(
         @Path("name") name: String,
-        @Query("lastMatch") lastMatch: Long
+        @Query("lastMatch") lastMatch: Long? = System.currentTimeMillis()
     ): Response<MatchesResponse>
 }
