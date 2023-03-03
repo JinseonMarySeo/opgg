@@ -4,6 +4,7 @@ import com.maryseo.opgg_test.BuildConfig
 import com.maryseo.opgg_test.network.api.ApiHelper
 import com.maryseo.opgg_test.network.api.ApiHelperImpl
 import com.maryseo.opgg_test.network.api.ApiService
+import com.skydoves.sandwich.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,7 @@ object ApiModule {
         .baseUrl(baseUrl)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
         .build()
 
     @Singleton

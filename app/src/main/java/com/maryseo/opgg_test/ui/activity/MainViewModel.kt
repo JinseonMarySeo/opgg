@@ -1,5 +1,6 @@
 package com.maryseo.opgg_test.ui.activity
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,19 +8,23 @@ import androidx.lifecycle.viewModelScope
 import com.maryseo.opgg_test.network.data.dto.Game
 import com.maryseo.opgg_test.network.data.dto.Summoner
 import com.maryseo.opgg_test.network.data.response.MatchesResponse
-import com.maryseo.opgg_test.network.other.Result
+import com.maryseo.opgg_test.network.other.ApiState
 import com.maryseo.opgg_test.network.repository.MainRepository
+import com.skydoves.sandwich.onFailure
+import com.skydoves.sandwich.suspendOnSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
-    private val _summoner = MutableLiveData<Result<Summoner>>()
-    val summoner: LiveData<Result<Summoner>> = _summoner
+    private val _summoner: MutableStateFlow<ApiState<Summoner>> = MutableStateFlow(ApiState.Loading())
+    val summoner: StateFlow<ApiState<Summoner>> = _summoner
 
-    private val _matches = MutableLiveData<Result<MatchesResponse>>()
-    val matches: LiveData<Result<MatchesResponse>> = _matches
+    private val _matches: MutableStateFlow<ApiState<MatchesResponse>> = MutableStateFlow(ApiState.Loading())
+    val matches: StateFlow<ApiState<MatchesResponse>> = _matches
 
     private val _latestMatches = MutableLiveData<MatchesResponse>()
     val latestMatch: LiveData<MatchesResponse> = _latestMatches
@@ -40,34 +45,30 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
         list?.let {  _gameList.value?.addAll(list) }
     }
 
-    fun getSummoner(name: String) {
+    fun getSummoner(name: String, errorMessage: String) {
         viewModelScope.launch {
-            _summoner.postValue(Result.loading())
-            repository.getSummoner(name).let {
-                if (it.isSuccessful) {
-                    _summoner.postValue(Result.success(it.body()?.summoner))
-                } else {
-                    _summoner.postValue(Result.fail(it.errorBody().toString()))
+            _summoner.value = ApiState.Loading()
+            repository.getSummoner(name)
+                .suspendOnSuccess {
+                    _summoner.emit(ApiState.Success(data.summoner))
+                }.onFailure {
+                    _summoner.value = ApiState.Error(errorMessage)
                 }
-            }
         }
     }
 
-    fun getMatches(name: String, createDate: Long? = null) {
+    fun getMatches(name: String, lastMatch: Long? = null, errorMessage: String) {
         viewModelScope.launch {
-            _matches.postValue(Result.loading())
-            repository.getMatches(name, createDate).let {
-                if (it.isSuccessful) {
-                    if (createDate == null) {
-                        _latestMatches.postValue(it.body())
+            _matches.value = ApiState.Loading()
+            repository.getMatches(name, lastMatch)
+                .suspendOnSuccess {
+                    if (lastMatch == null) {
+                        _latestMatches.postValue(data)
                         initGameList()
                     }
-                    _matches.postValue(Result.success(it.body()))
-                    addGameList(Result.success(it.body()).data?.games)
-                } else {
-                    _matches.postValue(Result.fail(it.errorBody().toString()))
-                }
-            }
+                    _matches.value = ApiState.Success(data)
+                    addGameList(matches.value.data?.games)
+                }.onFailure { _matches.value = ApiState.Error(errorMessage) }
         }
     }
 }

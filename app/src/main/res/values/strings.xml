@@ -17,4 +17,5 @@
     <string name="title_most_rate">모스트 승률</string>
     <string name="title_position">포지션</string>
 
+    <string name="message_api_error">데이터를 가져올 수 없습니다.</string>
 </resources>
