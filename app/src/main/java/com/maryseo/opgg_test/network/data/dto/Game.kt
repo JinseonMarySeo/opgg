@@ -2,7 +2,7 @@ package com.maryseo.opgg_test.network.data.dto
 
 data class Game(
     val champion: GameChampion,
-    val createDate: Int,
+    val createDate: Long,
     val gameId: String,
     val gameLength: Int,
     val gameType: String,

@@ -19,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -40,7 +41,34 @@ fun ButtonCircleArrow(modifier: Modifier) {
         Image(
             painter = painterResource(R.drawable.icon_arrow_right),
             contentDescription = null,
-            modifier = Modifier.size(24.dp).align(Alignment.Center)
+            modifier = Modifier
+                .size(24.dp)
+                .align(Alignment.Center)
         )
     }
+}
+
+@Composable
+fun BackgroundCircleShape(size: Dp) {
+    Box(modifier = Modifier
+        .background(PaleGrey2)
+        .size(size)
+        .clip(CircleShape)
+    ) {}
+}
+
+@Composable
+fun BackgroundRoundedShape(size: Dp, radius: Dp) {
+    Box(
+        modifier = Modifier
+            .background(color = PaleGrey2)
+            .size(size)
+            .clip(RoundedCornerShape(4.dp))
+
+    )
+//    Box(modifier = Modifier
+//        .background(PaleGrey2)
+//        .size(size)
+//        .clip(RoundedCornerShape(radius))
+//    )
 }

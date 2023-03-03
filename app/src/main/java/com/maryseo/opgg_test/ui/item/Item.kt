@@ -17,18 +17,57 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
+import com.maryseo.opgg_test.network.data.dto.Game
+import com.maryseo.opgg_test.network.data.dto.Item
 import com.maryseo.opgg_test.network.data.dto.League
 import com.maryseo.opgg_test.network.data.response.MatchesResponse
-import com.maryseo.opgg_test.ui.activity.getValidUrl
 import com.maryseo.opgg_test.ui.theme.*
+import com.maryseo.opgg_test.util.formatGameLength
+import com.maryseo.opgg_test.util.formatTimestamp
+import com.maryseo.opgg_test.util.getValidUrl
+import com.maryseo.opgg_test.util.strIsWin
 import java.text.NumberFormat
 
+
+@Composable
+fun IconProfileWithTxt(modifier: Modifier, imgUrl: String?, name: String?) {
+    Box(
+        contentAlignment = Alignment.BottomStart,
+        modifier = modifier
+    ) {
+        IconCircle(
+            modifier = Modifier.align(alignment = Alignment.TopCenter),
+            imgUrl = imgUrl,
+            size = dimensionResource(id = R.dimen.profile_circle_size)
+        )
+
+        if (!name.isNullOrEmpty()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(DarkGrey)
+                    .defaultMinSize(minWidth = 33.dp, minHeight = 20.dp)
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = name,
+                    style = Typography.caption,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun IconChampionWithBadge(modifier: Modifier, imgUrl: String?, name: String?) {
@@ -46,16 +85,17 @@ fun IconChampionWithBadge(modifier: Modifier, imgUrl: String?, name: String?) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(DarkGrey)
-                    .defaultMinSize(minWidth = 33.dp, minHeight = 20.dp)
-                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(BorderStroke(1.dp, White), shape = RoundedCornerShape(8.dp))
+                    .background(OrangeYellow)
+                    .defaultMinSize(minWidth = 30.dp, minHeight = 16.dp)
+                    .padding(horizontal = 4.dp, vertical = 3.dp)
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = name,
-                    color = Color.White,
-                    fontSize = 12.sp,
+                    style = Typography.caption,
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             }
@@ -78,7 +118,7 @@ fun IconChampionWithRate(modifier: Modifier, imgUrl: String?, rate: Int) {
             modifier = Modifier.padding(top = 5.dp),
             text = stringResource(id = R.string.format_percent).format(rate),
             color = Color.DarkGray,
-            style = Typography.caption,
+            style = Typography.body2,
             textAlign = TextAlign.Center
         )
     }
@@ -124,7 +164,7 @@ fun LeagueItem(league: League) {
                     start.linkTo(image.end, margin = defaultPadding)
                 },
                 text = league.tierRank.name,
-                style = Typography.caption,
+                style = Typography.body2,
                 color = SoftBlue
             )
 
@@ -145,7 +185,7 @@ fun LeagueItem(league: League) {
                 text = NumberFormat.getNumberInstance()
                     .format(league.tierRank.lp)
                     .plus(" LP"),
-                style = Typography.caption,
+                style = Typography.body2,
                 color = Gunmetal
             )
 
@@ -159,7 +199,7 @@ fun LeagueItem(league: League) {
                     league.losses,
                     league.rate
                 ),
-                style = Typography.caption,
+                style = Typography.body2,
                 color = CoolGrey
             )
 
@@ -194,7 +234,7 @@ fun MatchHeader(match: MatchesResponse) {
                     start.linkTo(parent.start)
                 },
             text = stringResource(id = R.string.title_recent_matches),
-            style = Typography.caption,
+            style = Typography.body2,
             color = CoolGrey
         )
 
@@ -204,18 +244,14 @@ fun MatchHeader(match: MatchesResponse) {
                 start.linkTo(parent.start)
             },
             text = "3.65:1 (66%)",
-            style = Typography.caption
+            style = Typography.body2
         )
 
-        val strStats = stringResource(id = R.string.format_stats).format(match.summary.kills, match.summary.assists, match.summary.deaths) //"5.9 / 5.8 / 14.1"
-
-        Text(
-            modifier = Modifier.constrainAs(stats) {
-                bottom.linkTo(kda.top, margin = 3.dp)
-                start.linkTo(parent.start)
-            }, text = AnnotatedTextForStats(text = strStats),
-            style = Typography.subtitle1
-        )
+        val data = arrayOf(match.summary.kills, match.summary.assists, match.summary.deaths)
+        Stats(modifier = Modifier.constrainAs(stats) {
+            bottom.linkTo(kda.top, margin = 3.dp)
+            start.linkTo(parent.start)
+        }, style = Typography.subtitle1, data = data)
 
         Text(
             modifier = Modifier.constrainAs(result) {
@@ -223,7 +259,7 @@ fun MatchHeader(match: MatchesResponse) {
                 bottom.linkTo(stats.top, margin = 2.dp)
                 start.linkTo(parent.start)
             }, text = stringResource(id = R.string.format_record_base).format(match.summary.wins, match.summary.losses),
-            style = Typography.caption,
+            style = Typography.body2,
             color = CoolGrey
         )
 
@@ -238,7 +274,7 @@ fun MatchHeader(match: MatchesResponse) {
                 }
                 .width(dimensionResource(id = R.dimen.header_most_rate_width)),
             text = stringResource(id = R.string.title_most_rate),
-            style = Typography.caption,
+            style = Typography.body2,
             color = CoolGrey,
             textAlign = TextAlign.Center
         )
@@ -258,7 +294,7 @@ fun MatchHeader(match: MatchesResponse) {
                 }
                 .width(dimensionResource(id = R.dimen.header_position_width)),
             text = stringResource(id = R.string.title_position),
-            style = Typography.caption,
+            style = Typography.body2,
             color = CoolGrey,
             textAlign = TextAlign.Center
         )
@@ -284,10 +320,107 @@ fun MatchHeader(match: MatchesResponse) {
                 }
                 .width(dimensionResource(id = R.dimen.header_position_width)),
             text = stringResource(id = R.string.format_percent).format(match.getMostPosition().getRate()),
-            style = Typography.caption,
+            style = Typography.body2,
             color = DarkGrey,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+fun MatchItem(game: Game) {
+    val defaultPadding = dimensionResource(id = R.dimen.default_horizontal_margin)
+    val stats = game.stats
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(White)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(dimensionResource(id = R.dimen.match_result_left_width))
+                .defaultMinSize(minHeight = 104.dp)
+                .background(if (game.isWin) DarkishPink else SoftBlue),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = strIsWin(isWin = game.isWin), style = Typography.h2, color = White)
+            BarView(width = 16.dp, height = 1.dp, color = White_40)
+            Text(text = formatGameLength(gameLength = game.gameLength), style = Typography.body1, color = White)
+        }
+
+        Column {
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(defaultPadding)
+            ) {
+                val (champion, grid, type, timestamp, stat, item, multiKill) = createRefs()
+                val championImgUrl = game.champion.imageUrl
+                val imageWidth = dimensionResource(id = R.dimen.champion_circle_size)
+                val height = imageWidth + 5.dp
+                IconChampionWithBadge(
+                    modifier = Modifier
+                        .constrainAs(champion) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                        }
+                        .size(imageWidth, height),
+                    imgUrl = championImgUrl,
+                    name = game.stats.general.opScoreBadge
+                )
+
+                GridSpellAndPeak(modifier = Modifier.constrainAs(grid) {
+                    top.linkTo(parent.top)
+                    start.linkTo(champion.end, margin = 4.dp)
+                }, game)
+
+                Column(modifier = Modifier
+                    .constrainAs(stat) {
+                        top.linkTo(parent.top)
+                        start.linkTo(grid.end, margin = defaultPadding)
+                    }
+                    .padding(vertical = 2.dp)) {
+                    val data = arrayOf(stats.general.kill, stats.general.assist, stats.general.death)
+                    Stats(
+                        modifier = Modifier.padding(bottom = 2.dp),
+                        style = Typography.h2,
+                        data = data
+                    )
+                    Text(
+                        text = stringResource(id = R.string.format_kill_rate).format(stats.general.contributionForKillRate),
+                        style = Typography.body1
+                    )
+                }
+
+                RowItems(modifier = Modifier
+                    .constrainAs(item) {
+                        top.linkTo(grid.bottom, margin = 8.dp)
+                        start.linkTo(parent.start)
+                        bottom.linkTo(parent.bottom)
+                    }, items = game.items
+                )
+
+                Text(modifier = Modifier.constrainAs(type) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                }, text = game.gameType, style = Typography.body1, color = CoolGrey)
+
+                Text(modifier = Modifier.constrainAs(timestamp) {
+                    top.linkTo(type.bottom)
+                    end.linkTo(parent.end)
+                }, text = formatTimestamp(timestamp = game.createDate), style = Typography.body1, color = CoolGrey)
+
+                if (!stats.general.largestMultiKillString.isNullOrEmpty()) {
+                    BorderWithTxt(modifier = Modifier.constrainAs(multiKill) {
+                        bottom.linkTo(parent.bottom, margin = 2.dp)
+                        end.linkTo(parent.end)
+                    }, text = stats.general.largestMultiKillString, DarkishPink, 12.dp)
+                }
+            }
+        }
     }
 }
 
@@ -313,5 +446,45 @@ fun MostChampionsUI(modifier: Modifier, match: MatchesResponse) {
                 rate = match.getMostChampions()[1].getRate()
             )
         }
+    }
+}
+
+@Composable
+fun GridSpellAndPeak(modifier: Modifier, game: Game) {
+    val space = 2.dp
+    val size = 19.dp
+
+    Row(modifier,
+        horizontalArrangement = Arrangement.spacedBy(space)) {
+        Column(verticalArrangement = Arrangement.spacedBy(space)) {
+            IconRadius(modifier = Modifier, imgUrl = game.spells[0].imageUrl, size = size, radius = 4.dp)
+            IconRadius(modifier = Modifier, imgUrl = game.spells[1].imageUrl, size = size, radius = 4.dp)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(space)) {
+            IconCircle(modifier = Modifier, imgUrl = game.peak[0], size = size)
+            IconCircle(modifier = Modifier, imgUrl = game.peak[1], size = size)
+        }
+    }
+}
+
+@Composable
+fun RowItems(modifier: Modifier, items: List<Item>) {
+    val space = 2.dp
+    val size = 24.dp
+
+    Row(modifier,
+        horizontalArrangement = Arrangement.spacedBy(space)) {
+        val iterator = items.iterator()
+        var index = 0
+        while (index < 6) {
+            val imgUrl = if (iterator.hasNext()) {
+                iterator.next().imageUrl
+            } else {
+                null
+            }
+            IconRadius(modifier = Modifier, imgUrl = imgUrl, size = size, radius = 4.dp)
+            index++
+        }
+        IconCircle(modifier = Modifier, imgUrl = null, size = size)
     }
 }

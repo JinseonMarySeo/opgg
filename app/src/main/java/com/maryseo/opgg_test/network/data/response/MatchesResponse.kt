@@ -1,6 +1,5 @@
 package com.maryseo.opgg_test.network.data.response
 
-import android.util.Log
 import com.maryseo.opgg_test.network.data.dto.Champion
 import com.maryseo.opgg_test.network.data.dto.Game
 import com.maryseo.opgg_test.network.data.dto.Position
@@ -18,10 +17,6 @@ data class MatchesResponse(
     }
 
     fun getMostPosition(): Position {
-//        val t = positions.sortedByDescending { it.wins.toFloat() / it.games }.take(1)
         return positions.sortedByDescending { it.wins.toFloat() / it.games }.take(1)[0]
     }
-
-//    val mostChampions: List<Champion> = champions.sortedByDescending { it.wins.toFloat() / it.games }.take(2)
-//    val mostPosition = positions.sortedByDescending { it.wins.toFloat() / it.games }.take(1)
 }
