@@ -12,7 +12,14 @@ val Typography = Typography(
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 12.sp,
+        color = Gunmetal
+    ),
+
+    body2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 10.sp
     ),
 
     h1 = TextStyle(
@@ -20,6 +27,13 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         color = Color.DarkGray,
         fontSize = 22.sp
+    ),
+
+    h2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        color = Color.DarkGray,
+        fontSize = 16.sp
     ),
 
     subtitle1 = TextStyle(
@@ -32,19 +46,7 @@ val Typography = Typography(
     caption = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 10.sp
+        fontSize = 10.sp,
+        color = White
     )
-
-    /* Other default text styles to override
-    button = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.W500,
-        fontSize = 14.sp
-    ),
-    caption = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp
-    )
-    */
 )

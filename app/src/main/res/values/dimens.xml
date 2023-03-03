@@ -4,6 +4,7 @@
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="default_horizontal_margin">16dp</dimen>
+    <dimen name="default_vertical_margin">12dp</dimen>
     <dimen name="card_horizontal_space">8dp</dimen>
 
     <dimen name="profile_circle_size">72dp</dimen>
@@ -12,6 +13,9 @@
     <dimen name="champion_most_size">30dp</dimen>
     <dimen name="league_card_width">240dp</dimen>
     <dimen name="right_arrow_back_size">40dp</dimen>
+    <dimen name="header_position_width">80dp</dimen>
+    <dimen name="header_most_rate_width">110dp</dimen>
+    <dimen name="match_result_left_width">40dp</dimen>
 
     <dimen name="font_default">14sp</dimen>
     <dimen name="font_title">22sp</dimen>
