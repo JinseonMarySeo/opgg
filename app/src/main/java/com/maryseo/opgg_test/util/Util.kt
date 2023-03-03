@@ -1,14 +1,18 @@
 package com.maryseo.opgg_test.util
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.maryseo.opgg_test.R
-import com.maryseo.opgg_test.ui.item.AnnotatedTextForStats
-import com.maryseo.opgg_test.ui.theme.Typography
 import kotlin.math.roundToInt
+
+
+fun getValidUrl(url: String): String {
+    val prefix = "https:"
+    val validUrl = StringBuilder(url)
+    if (!url.startsWith(prefix))
+        validUrl.insert(0, prefix)
+    return validUrl.toString()
+}
 
 @Composable
 fun formatTimestamp(timestamp: Long): String {

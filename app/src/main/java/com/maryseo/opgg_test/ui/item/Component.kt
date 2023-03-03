@@ -1,9 +1,10 @@
 package com.maryseo.opgg_test.ui.item
 
 import android.net.Uri
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,19 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.maryseo.opgg_test.R
-import com.maryseo.opgg_test.network.data.dto.Game
-import com.maryseo.opgg_test.network.data.dto.Item
-import com.maryseo.opgg_test.ui.activity.getValidUrl
 import com.maryseo.opgg_test.ui.theme.*
+import com.maryseo.opgg_test.util.getValidUrl
 
 
 @Composable
@@ -77,7 +74,9 @@ fun IconCircle(modifier: Modifier, imgUrl: String?, size: Dp) {
                 contentScale = ContentScale.FillWidth
             )
         } ?: run {
-            Box(modifier = Modifier.fillMaxSize().background(PaleGrey2))
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(PaleGrey2))
         }
     }
 }
@@ -96,41 +95,30 @@ fun IconRadius(modifier: Modifier, imgUrl: String?, size: Dp, radius: Dp) {
                 contentScale = ContentScale.FillWidth
             )
         } ?: run {
-            Box(modifier = Modifier.fillMaxSize().background(PaleGrey2))
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(PaleGrey2))
         }
     }
 }
 
 @Composable
-fun IconProfileWithTxt(modifier: Modifier, imgUrl: String?, name: String?) {
+fun BorderWithTxt(modifier: Modifier, text: String, color: Color, radius: Dp) {
     Box(
-        contentAlignment = Alignment.BottomStart,
         modifier = modifier
+            .clip(RoundedCornerShape(radius))
+            .background(White)
+            .border(BorderStroke(1.dp, color = color), shape = RoundedCornerShape(radius))
+            .defaultMinSize(minWidth = 65.dp, minHeight = 20.dp)
+            .padding(horizontal = 8.dp, vertical = 5.dp)
     ) {
-        IconCircle(
-            modifier = Modifier.align(alignment = Alignment.TopCenter),
-            imgUrl = imgUrl,
-            size = dimensionResource(id = R.dimen.profile_circle_size)
+        Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = text,
+            style = Typography.body2,
+            color = color,
+            textAlign = TextAlign.Center
         )
-
-        if (!name.isNullOrEmpty()) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(DarkGrey)
-                    .defaultMinSize(minWidth = 33.dp, minHeight = 20.dp)
-                    .padding(horizontal = 6.dp, vertical = 3.dp)
-            ) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = name,
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
     }
 }
 
